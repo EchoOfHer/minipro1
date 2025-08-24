@@ -1,25 +1,18 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 //Function all expenses
-void allExpense(){
-
-}
+void allExpense() {}
 //Function Todays expense
-void TodaysExpense(){
-
-}
+void TodaysExpense() {}
 //Function Searching
-void Searching(){
-
-}
+void Searching() {}
 //Function Add new expense
-void add(){
-
-}
+void add() {}
 //Function Delete an expense
-void delete(){
-  
-}
-void main() {
+void delete() {}
+void main() async {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
     1: "All expense",
@@ -27,24 +20,43 @@ void main() {
     3: "Serch",
     4: "Add new expense",
     5: "Delete an expense",
-    6: "Exit"
+    6: "Exit",
   };
+  //fetch from server after login
+  String? confirmedUsername;
+  int? confirmedUserId;
   //Login
   print('==== Login ====');
   stdout.write('Username: ');
-  String? username = stdin.readLineSync();
+  String? inputUsername = stdin.readLineSync();
   stdout.write('Password: ');
   String? password = stdin.readLineSync();
 
-  if (username != null && password != null) {
+  if (inputUsername != null && password != null) {
     //.... Check login, This is dummy condition
-    if (0 == 0) {
-      int? selectedMenu; // Declare selectedMenu outside the loop
+    final body = {"username": inputUsername, "password": password};
+    final url = Uri.parse('http://localhost:3000/login');
+    final response = await http.post(url, body: body);
 
+    if (response.statusCode == 200) {
+      int? selectedMenu; // Declare selectedMenu outside the loop
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic>? user = responseData['user'];
+      if (user != null &&
+          user.containsKey('username') &&
+          user.containsKey('id')) {
+        confirmedUsername = user['username']; 
+        confirmedUserId = user['id']; 
+      } else {
+        print(
+          'Warning: Server did not provide username in response. Using input username.',
+        );
+        confirmedUsername = inputUsername; 
+      }
       // Main Application Loop
       do {
         print('\n========== Expense Tracking App ==========');
-        print('Welcome ... '); // Display the entered username
+        print('Welcome $confirmedUsername '); 
         menu.forEach((key, value) {
           print('$key. $value');
         });
@@ -97,6 +109,8 @@ void main() {
           stdin.readLineSync(); // Wait for user to press Enter
         }
       } while (selectedMenu != 6);
+    } else {
+      print("Username or password wrong!");
     }
   } else {
     print('Input error. Please try again');
