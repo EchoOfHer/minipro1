@@ -1,11 +1,27 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+
+const baseUrl = "http://localhost:3000"; // Node.js server
 //Function all expenses
 void allExpense(){
 
 }
 //Function Todays expense
-void TodaysExpense(){
-
+Future<void> TodaysExpense(String userId) async {
+  var response = await http.get(Uri.parse("$baseUrl/expenses/$userId"));
+  if (response.statusCode == 200) {
+    var data = jsonDecode(response.body);
+    print("===== Today's Expenses =====");
+    String today = DateTime.now().toString().substring(0, 10);
+    for (var exp in data) {
+      if (exp['date'].toString().startsWith(today)) {
+        print("${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}");
+      }
+    }
+  } else {
+    print("Error fetching today's expenses.");
+  }
 }
 //Function Searching
 void Searching(){
