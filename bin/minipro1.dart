@@ -22,7 +22,7 @@ const baseUrl = "http://localhost:3000"; // Node.js server
 
 
 //Function Todays expense
-Future<void> TodaysExpense(String userId) async {
+  Future<void> TodaysExpense(String userId) async {
   var response = await http.get(Uri.parse("$baseUrl/expenses/$userId"));
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
@@ -37,6 +37,7 @@ Future<void> TodaysExpense(String userId) async {
     print("Error fetching today's expenses.");
   }
 }
+
 
 //Function Searching
 void Searching() {}
