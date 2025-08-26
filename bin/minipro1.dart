@@ -4,17 +4,33 @@ import 'package:http/http.dart' as http;
 
 //Function all expenses
 const baseUrl = "http://localhost:3000"; // Node.js server
-Future<void> getAllExpenses() async {
-  final response = await http.get(Uri.parse("$baseUrl/expenses"));
+Future<void> AllExpenses() async {
+  try {
+    var response = await http.get(Uri.parse("$baseUrl/expenses"));
 
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-    print("All expenses: $data");
-  } else {
-    print("Error: ${response.statusCode} ${response.reasonPhrase}");
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      print("===== All Expenses =====");
+
+      if (data['expenses'].isEmpty) {
+        print("No expenses found.");
+      } else {
+        for (var exp in data['expenses']) {
+          print(
+            "${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}",
+          );
+        }
+      }
+    } else {
+      print(
+        "Error fetching all expenses. Status code: ${response.statusCode}",
+      );
+    }
+  } catch (e) {
+    print("Error: $e");
   }
 }
-
 //Function Todays expense
 
 
