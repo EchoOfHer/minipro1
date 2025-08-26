@@ -1,24 +1,17 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 //Function all expenses
-void allExpense(){
-
-}
+void allExpense() {}
 //Function Todays expense
-void TodaysExpense(){
-
-}
+void TodaysExpense() {}
 //Function Searching
-void Searching(){
-
-}
+void Searching() {}
 //Function Add new expense
-void add(){
-
-}
+void add() {}
 //Function Delete an expense
-void delete(){
-  
-}
+void delete() {}
 void main() {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
@@ -27,7 +20,7 @@ void main() {
     3: "Serch",
     4: "Add new expense",
     5: "Delete an expense",
-    6: "Exit"
+    6: "Exit",
   };
   //Login
   print('==== Login ====');
