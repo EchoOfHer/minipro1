@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 //Function all expenses
 void allExpense(){
@@ -8,8 +9,26 @@ void TodaysExpense(){
 
 }
 //Function Searching
-void Searching(){
+void Searching(List<String> items) {
+  stdout.write("Item to Search: ");
+  String keyword = stdin.readLineSync()?.trim().toLowerCase() ?? "";
 
+  if (keyword.isEmpty) {
+    print("❌ Item not found");
+    return;
+  }
+
+  // กรองข้อมูลที่มี keyword อยู่ใน string
+  List<String> results = items.where((item) => item.toLowerCase().contains(keyword)).toList();
+
+  if (results.isEmpty) {
+    print("Item not found '$keyword'");
+  } else {
+    print("✅ พบข้อมูล:");
+    for (var r in results) {
+      print("- $r");
+    }
+  }
 }
 //Function Add new expense
 void add(){
@@ -68,6 +87,8 @@ void main() {
             case 3:
               //---> go to searching function
               print('Searching expenses...');
+              Searching(List<String> items);
+
               // Call your searchFunction() here
               break;
             case 4:
