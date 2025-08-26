@@ -11,17 +11,40 @@ void Searching() {}
 //Function Add new expense
 void add() {}
 //Function Delete an expense
-Future<void> deleteExpense(String baseUrl) async {
-  stdout.write("Item id: ");
-  String? id = stdin.readLineSync();
+Future<void> deleteExpense(int userId) async {
+  print("===== Delete Expense =====");
+  stdout.write("Enter item ID to delete: ");
+  String? input = stdin.readLineSync();
 
-  var response = await http.delete(Uri.parse("$baseUrl/expenses/$id"));
+  if (input == null || input.isEmpty) {
+    print("ID is required.");
+    return;
+  }
+
+  final expenseId = int.tryParse(input);
+  if (expenseId == null) {
+    print("Invalid ID format.");
+    return;
+  }
+
+  final url = Uri.parse("http://localhost:3000/deleteexpense");
+
+  var response = await http.delete(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "user_id": userId,
+      "expense_id": expenseId,
+    }),
+  );
+
   if (response.statusCode == 200) {
-    print(jsonDecode(response.body)["Delete!"]);
+    print("Deleted!");
   } else {
     print("Error deleting expense: ${response.body}");
   }
 }
+
 
 void main() {
   //["All expense","Today's expense","Serch"];
@@ -72,7 +95,7 @@ void main() {
             case 3:
               //---> go to searching function
               print('Searching expenses...');
-              // Call your searchFunction() here
+              await deleteExpense(userId);
               break;
             case 4:
               //---> go to Adding function
