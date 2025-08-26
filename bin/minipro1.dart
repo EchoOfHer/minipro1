@@ -11,7 +11,18 @@ void Searching() {}
 //Function Add new expense
 void add() {}
 //Function Delete an expense
-void delete() {}
+Future<void> deleteExpense(String baseUrl) async {
+  stdout.write("Enter expense ID to delete: ");
+  String? id = stdin.readLineSync();
+
+  var response = await http.delete(Uri.parse("$baseUrl/expenses/$id"));
+  if (response.statusCode == 200) {
+    print(jsonDecode(response.body)["message"]);
+  } else {
+    print("Error deleting expense: ${response.body}");
+  }
+}
+
 void main() {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
