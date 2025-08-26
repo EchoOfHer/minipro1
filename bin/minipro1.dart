@@ -39,7 +39,6 @@ Future<void> addExpense(int userId) async {
     print("Error adding expense: ${response.body}");
   }
 }
-
 //Function Delete an expense
 void delete() {}
 void main() async {
@@ -114,7 +113,6 @@ void main() async {
               break;
             case 4:
               //---> go to Adding function
-              print('Adding new expense...');
               await addExpense(confirmedUserId!);
               break;
             case 5:
