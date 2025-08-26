@@ -8,29 +8,7 @@ void TodaysExpense() {}
 //Function Searching
 void Searching() {}
 //Function Add new expense
-Future<void> addExpense(String baseUrl, String userId) async {
-  stdout.write("Item: ");
-  String? item = stdin.readLineSync();
-  stdout.write("Paid: ");
-  String? paid = stdin.readLineSync();
-
-  var response = await http.post(
-    Uri.parse("$baseUrl/expenses"),
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode({
-      "user_id": userId,
-      "item": item,
-      "paid": int.tryParse(paid ?? "0"),
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    print(jsonDecode(response.body)["message"]);
-  } else {
-    print("Error adding expense: ${response.body}");
-  }
-}
-
+void add() {}
 //Function Delete an expense
 void delete() {}
 void main() async {
@@ -106,7 +84,7 @@ void main() async {
             case 4:
               //---> go to Adding function
               print('Adding new expense...');
-              await addExpense(baseUrl, userId);
+              // Call your addExpense() function here
               break;
             case 5:
               //---> go to Delete function
