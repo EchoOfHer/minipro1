@@ -21,7 +21,7 @@ Future<void> addExpense(int userId) async {
     return;
   }
 
-  final url = Uri.parse("http://localhost:3000/addexpenses");
+  final url = Uri.parse("http://localhost:3000/addexpense");
 
   var response = await http.post(
     url,
