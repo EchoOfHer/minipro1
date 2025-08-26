@@ -2,8 +2,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 //Function all expenses
-void allExpense(){
-//Function all expenses
 void allExpense() {}
 //Function Todays expense
 void TodaysExpense() {}
@@ -46,18 +44,18 @@ void main() async {
       if (user != null &&
           user.containsKey('username') &&
           user.containsKey('id')) {
-        confirmedUsername = user['username']; 
-        confirmedUserId = user['id']; 
+        confirmedUsername = user['username'];
+        confirmedUserId = user['id'];
       } else {
         print(
           'Warning: Server did not provide username in response. Using input username.',
         );
-        confirmedUsername = inputUsername; 
+        confirmedUsername = inputUsername;
       }
       // Main Application Loop
       do {
         print('\n========== Expense Tracking App ==========');
-        print('Welcome $confirmedUsername '); 
+        print('Welcome $confirmedUsername ');
         menu.forEach((key, value) {
           print('$key. $value');
         });
