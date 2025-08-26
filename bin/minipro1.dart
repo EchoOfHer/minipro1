@@ -9,7 +9,37 @@ void TodaysExpense() {}
 //Function Searching
 void Searching() {}
 //Function Add new expense
-void add() {}
+Future<void> addExpense(int userId) async {
+  print("===== Add New Item =====");
+  stdout.write("Item: ");
+  String? item = stdin.readLineSync();
+  stdout.write("Paid: ");
+  String? paid = stdin.readLineSync();
+
+  if (item == null || item.isEmpty || paid == null || paid.isEmpty) {
+    print("Please fill in both fields.");
+    return;
+  }
+
+  final url = Uri.parse("http://localhost:3000/addexpenses");
+
+  var response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "user_id": userId,
+      "item": item,
+      "paid": int.tryParse(paid) ?? 0,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print("Inserted!");
+  } else {
+    print("Error adding expense: ${response.body}");
+  }
+}
+
 //Function Delete an expense
 Future<void> deleteExpense(int userId) async {
   print("===== Delete Expense =====");
@@ -32,10 +62,7 @@ Future<void> deleteExpense(int userId) async {
   var response = await http.delete(
     url,
     headers: {"Content-Type": "application/json"},
-    body: jsonEncode({
-      "user_id": userId,
-      "expense_id": expenseId,
-    }),
+    body: jsonEncode({"user_id": userId, "expense_id": expenseId}),
   );
 
   if (response.statusCode == 200) {
@@ -45,8 +72,7 @@ Future<void> deleteExpense(int userId) async {
   }
 }
 
-
-void main() {
+void main() async {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
     1: "All expense",
@@ -56,22 +82,41 @@ void main() {
     5: "Delete an expense",
     6: "Exit",
   };
+  //fetch from server after login
+  String? confirmedUsername;
+  int? confirmedUserId;
   //Login
   print('==== Login ====');
   stdout.write('Username: ');
-  String? username = stdin.readLineSync();
+  String? inputUsername = stdin.readLineSync();
   stdout.write('Password: ');
   String? password = stdin.readLineSync();
 
-  if (username != null && password != null) {
+  if (inputUsername != null && password != null) {
     //.... Check login, This is dummy condition
-    if (0 == 0) {
-      int? selectedMenu; // Declare selectedMenu outside the loop
+    final body = {"username": inputUsername, "password": password};
+    final url = Uri.parse('http://localhost:3000/login');
+    final response = await http.post(url, body: body);
 
+    if (response.statusCode == 200) {
+      int? selectedMenu; // Declare selectedMenu outside the loop
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic>? user = responseData['user'];
+      if (user != null &&
+          user.containsKey('username') &&
+          user.containsKey('id')) {
+        confirmedUsername = user['username'];
+        confirmedUserId = user['id'];
+      } else {
+        print(
+          'Warning: Server did not provide username in response. Using input username.',
+        );
+        confirmedUsername = inputUsername;
+      }
       // Main Application Loop
       do {
         print('\n========== Expense Tracking App ==========');
-        print('Welcome ... '); // Display the entered username
+        print('Welcome $confirmedUsername ');
         menu.forEach((key, value) {
           print('$key. $value');
         });
@@ -95,17 +140,16 @@ void main() {
             case 3:
               //---> go to searching function
               print('Searching expenses...');
-              await deleteExpense(userId);
+              // Call your searchFunction() here
               break;
             case 4:
               //---> go to Adding function
-              print('Adding new expense...');
-              // Call your addExpense() function here
+              await addExpense(confirmedUserId!);
               break;
             case 5:
               //---> go to Delete function
               print('Deleting an expense...');
-              // Call your deleteExpense() function here
+              await deleteExpense(confirmedUserId!);
               break;
             case 6:
               //---> end program
@@ -124,6 +168,8 @@ void main() {
           stdin.readLineSync(); // Wait for user to press Enter
         }
       } while (selectedMenu != 6);
+    } else {
+      print("Username or password wrong!");
     }
   } else {
     print('Input error. Please try again');
