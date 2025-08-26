@@ -13,7 +13,7 @@ Future<void> addExpense(int userId) async {
   print("===== Add New Item =====");
   stdout.write("Item: ");
   String? item = stdin.readLineSync();
-  stdout.write("Amount Paid: ");
+  stdout.write("Paid: ");
   String? paid = stdin.readLineSync();
 
   if (item == null || item.isEmpty || paid == null || paid.isEmpty) {
