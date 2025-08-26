@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 //Function all expenses
 void allExpense(){
-main
-
 //Function all expenses
 void allExpense() {}
 //Function Todays expense
