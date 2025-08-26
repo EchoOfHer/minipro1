@@ -12,12 +12,12 @@ void Searching() {}
 void add() {}
 //Function Delete an expense
 Future<void> deleteExpense(String baseUrl) async {
-  stdout.write("Enter expense ID to delete: ");
+  stdout.write("Item id: ");
   String? id = stdin.readLineSync();
 
   var response = await http.delete(Uri.parse("$baseUrl/expenses/$id"));
   if (response.statusCode == 200) {
-    print(jsonDecode(response.body)["message"]);
+    print(jsonDecode(response.body)["Delete!"]);
   } else {
     print("Error deleting expense: ${response.body}");
   }
