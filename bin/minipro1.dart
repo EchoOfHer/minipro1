@@ -34,7 +34,7 @@ Future<void> addExpense(String baseUrl, String userId) async {
 
 //Function Delete an expense
 void delete() {}
-void main() {
+Future<void> main() async {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
     1: "All expense",
@@ -88,7 +88,7 @@ void main() {
             case 4:
               //---> go to Adding function
               print('Adding new expense...');
-              // Call your addExpense() function here
+              await addExpense(baseUrl, userId);
               break;
             case 5:
               //---> go to Delete function
