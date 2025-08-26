@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
 //Function all expenses
 void allExpense() {}
 //Function Todays expense
@@ -8,24 +9,32 @@ void TodaysExpense() {}
 //Function Searching
 void Searching() {}
 //Function Add new expense
-Future<void> addExpense(String baseUrl, String userId) async {
+Future<void> addExpense(int userId) async {
+  print("===== Add New Item =====");
   stdout.write("Item: ");
   String? item = stdin.readLineSync();
-  stdout.write("Paid: ");
+  stdout.write("Amount Paid: ");
   String? paid = stdin.readLineSync();
 
+  if (item == null || item.isEmpty || paid == null || paid.isEmpty) {
+    print("Please fill in both fields.");
+    return;
+  }
+
+  final url = Uri.parse("http://localhost:3000/expenses");
+
   var response = await http.post(
-    Uri.parse("$baseUrl/expenses"),
+    url,
     headers: {"Content-Type": "application/json"},
     body: jsonEncode({
       "user_id": userId,
       "item": item,
-      "paid": int.tryParse(paid ?? "0"),
+      "paid": int.tryParse(paid) ?? 0,
     }),
   );
 
   if (response.statusCode == 200) {
-    print(jsonDecode(response.body)["message"]);
+    print("Inserted!");
   } else {
     print("Error adding expense: ${response.body}");
   }
@@ -106,7 +115,7 @@ void main() async {
             case 4:
               //---> go to Adding function
               print('Adding new expense...');
-              await addExpense(baseUrl, userId);
+              await addExpense(confirmedUserId!);
               break;
             case 5:
               //---> go to Delete function
