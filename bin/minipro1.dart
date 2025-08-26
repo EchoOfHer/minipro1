@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+
 //Function all expenses
 void allExpense() {}
 //Function Todays expense
@@ -8,7 +9,36 @@ void TodaysExpense() {}
 //Function Searching
 void Searching() {}
 //Function Add new expense
-void add() {}
+Future<void> addExpense(int userId) async {
+  print("===== Add New Item =====");
+  stdout.write("Item: ");
+  String? item = stdin.readLineSync();
+  stdout.write("Paid: ");
+  String? paid = stdin.readLineSync();
+
+  if (item == null || item.isEmpty || paid == null || paid.isEmpty) {
+    print("Please fill in both fields.");
+    return;
+  }
+
+  final url = Uri.parse("http://localhost:3000/addexpenses");
+
+  var response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "user_id": userId,
+      "item": item,
+      "paid": int.tryParse(paid) ?? 0,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print("Inserted!");
+  } else {
+    print("Error adding expense: ${response.body}");
+  }
+}
 //Function Delete an expense
 void delete() {}
 void main() async {
@@ -83,8 +113,7 @@ void main() async {
               break;
             case 4:
               //---> go to Adding function
-              print('Adding new expense...');
-              // Call your addExpense() function here
+              await addExpense(confirmedUserId!);
               break;
             case 5:
               //---> go to Delete function
