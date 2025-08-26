@@ -4,39 +4,18 @@ import 'package:http/http.dart' as http;
 
 //Function all expenses
 const baseUrl = "http://localhost:3000"; // Node.js server
+Future<void> getAllExpenses() async {
+  final response = await http.get(Uri.parse("$baseUrl/expenses"));
 
-  Future<void> allExpense(String userId) async {
-    var response = await http.get(Uri.parse("$baseUrl/expenses/$userId"));
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      print("===== All Expenses =====");
-      for (var exp in data['expenses']) {
-        print(
-          "${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}",
-        );
-      }
-    } else {
-      print("Error fetching expenses.");
-    }
-  }
-
-
-//Function Todays expense
-  Future<void> TodaysExpense(String userId) async {
-  var response = await http.get(Uri.parse("$baseUrl/expenses/$userId"));
   if (response.statusCode == 200) {
-    var data = jsonDecode(response.body);
-    print("===== Today's Expenses =====");
-    String today = DateTime.now().toString().substring(0, 10);
-    for (var exp in data) {
-      if (exp['date'].toString().startsWith(today)) {
-        print("${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}");
-      }
-    }
+    final data = jsonDecode(response.body);
+    print("All expenses: $data");
   } else {
-    print("Error fetching today's expenses.");
+    print("Error: ${response.statusCode} ${response.reasonPhrase}");
   }
 }
+
+//Function Todays expense
 
 
 //Function Searching
