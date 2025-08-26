@@ -9,20 +9,24 @@ void allExpense(){
 }
 //Function Todays expense
 Future<void> TodaysExpense(String userId) async {
-  var response = await http.get(Uri.parse("$baseUrl/expenses/$userId"));
+  var response = await http.get(Uri.parse("$baseUrl/expenses/today/$userId"));
+  
   if (response.statusCode == 200) {
     var data = jsonDecode(response.body);
     print("===== Today's Expenses =====");
-    String today = DateTime.now().toString().substring(0, 10);
-    for (var exp in data) {
-      if (exp['date'].toString().startsWith(today)) {
-        print("${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}");
-      }
+    
+    for (var exp in data['expenses']) {
+      print("${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}");
+    }
+    
+    if (data['expenses'].isEmpty) {
+      print("No expenses found for today.");
     }
   } else {
     print("Error fetching today's expenses.");
   }
 }
+
 //Function Searching
 void Searching(){
 
