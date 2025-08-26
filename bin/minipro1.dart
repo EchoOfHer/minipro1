@@ -4,41 +4,42 @@ import 'package:http/http.dart' as http;
 
 const baseUrl = "http://localhost:3000"; // Node.js server
 //Function all expenses
-void allExpense(){
-
-}
+void allExpense() {}
 //Function Todays expense
-Future<void> TodaysExpense(String userId) async {
-  var response = await http.get(Uri.parse("$baseUrl/expenses/today/$userId"));
-  
-  if (response.statusCode == 200) {
-    var data = jsonDecode(response.body);
-    print("===== Today's Expenses =====");
-    
-    for (var exp in data['expenses']) {
-      print("${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}");
+Future<void> TodaysExpense() async {
+  try {
+    var response = await http.get(Uri.parse("$baseUrl/expenses/today"));
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      print("===== Today's Expenses =====");
+
+      if (data['expenses'].isEmpty) {
+        print("No expenses found for today.");
+      } else {
+        for (var exp in data['expenses']) {
+          print(
+            "${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}",
+          );
+        }
+      }
+    } else {
+      print(
+        "Error fetching today's expenses. Status code: ${response.statusCode}",
+      );
     }
-    
-    if (data['expenses'].isEmpty) {
-      print("No expenses found for today.");
-    }
-  } else {
-    print("Error fetching today's expenses.");
+  } catch (e) {
+    print("Error: $e");
   }
 }
 
 //Function Searching
-void Searching(){
-
-}
+void Searching() {}
 //Function Add new expense
-void add(){
-
-}
+void add() {}
 //Function Delete an expense
-void delete(){
-  
-}
+void delete() {}
 void main() {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
@@ -47,7 +48,7 @@ void main() {
     3: "Serch",
     4: "Add new expense",
     5: "Delete an expense",
-    6: "Exit"
+    6: "Exit",
   };
   //Login
   print('==== Login ====');
