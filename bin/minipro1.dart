@@ -1,11 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-//Function all expenses
-void allExpense() {}
-//Function Todays expense
-void TodaysExpense() {}
 // Function Searching
 Future<void> Searching() async {
   stdout.write("Item to Search: ");
@@ -52,11 +49,129 @@ Future<void> Searching() async {
     }
   } catch (e) {
     print("Failed to connect to the server: $e");
+//Function all expenses
+const baseUrl = "http://localhost:3000"; // Node.js server
+Future<void> allExpenses(int userId) async {
+  try {
+    var response = await http.get(Uri.parse("$baseUrl/expenses/$userId"));
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      print("===== All Expenses for user $userId =====");
+
+      if (data['expenses'].isEmpty) {
+        print("No expenses found.");
+      } else {
+        int totalExpenses = 0;
+        for (var exp in data['expenses']) {
+          // Add the 'paid' value to the total
+          totalExpenses += exp['paid'] as int; 
+          print(
+            "${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}",
+          );
+        }
+        print("Total expenses = $totalExpenses ฿");
+      }
+    } else {
+      print("Error fetching expenses. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error: $e");
   }
 }
+//Function Todays expense
+Future<void> TodaysExpense(int userId) async {
+  try {
+    
+    var response = await http.get(
+      Uri.parse("$baseUrl/expenses/today/$userId"),
+    );
 
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      print("===== Today's Expenses =====");
+
+      if (data['expenses'].isEmpty) {
+        print("No expenses found for today.");
+      } else {
+        int totalToday = 0;
+        for (var exp in data['expenses']) {
+          // Add the 'paid' value to the daily total
+          totalToday += exp['paid'] as int;
+          print("${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}");
+        }
+        print("Total expenses for today = $totalToday ฿");
+      }
+    } else {
+      print("Error fetching today's expenses. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error: $e");
+  }
+}
+//Function Searching
+void Searching() {}
+//Function Add new expense
+Future<void> addExpense(int userId) async {
+  print("===== Add New Item =====");
+  stdout.write("Item: ");
+  String? item = stdin.readLineSync();
+  stdout.write("Paid: ");
+  String? paid = stdin.readLineSync();
+
+  if (item == null || item.isEmpty || paid == null || paid.isEmpty) {
+    print("Please fill in both fields.");
+    return;
+  }
+  final url = Uri.parse("http://localhost:3000/addexpenses");
+  var response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "user_id": userId,
+      "item": item,
+      "paid": int.tryParse(paid) ?? 0,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print("Inserted!");
+  } else {
+    print("Error adding expense: ${response.body}");
+  }
+}
 //Function Delete an expense
-void delete() {}
+Future<void> deleteExpense(int userId) async {
+  print("===== Delete an Item =====");
+  stdout.write('Item id: ');
+  int? id = int.tryParse(stdin.readLineSync() ?? '');
+
+  if (id == null) {
+    print('Invalid ID');
+    return;
+  }
+
+  final url = Uri.parse('http://localhost:3000/expense/$id?user_id=$userId');
+
+  try {
+    final response = await http.delete(url);
+
+    switch (response.statusCode) {
+      case 200:
+        print('Deleted!');
+        break;
+      case 404:
+        print('Item not found or does not belong to you.');
+        break;
+      default:
+        print('Failed to delete. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Request failed: $e');
+  }
+}
 void main() async {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
@@ -106,7 +221,7 @@ void main() async {
           print('$key. $value');
         });
 
-        stdout.write('Choose an option: '); // Clarified prompt
+        stdout.write('Choose...'); // Clarified prompt
         String? choosingMenu = stdin.readLineSync();
 
         if (choosingMenu != null) {
@@ -115,11 +230,13 @@ void main() async {
             case 1:
               //---> go to Summarize all expense function
               print('Viewing all expenses...');
+              await TodaysExpense(confirmedUserId!);
               // Call your summarizeAllExpenses() function here
               break;
             case 2:
               //---> go to Today's summarize function
               print("Viewing today's expenses...");
+              await allExpenses(confirmedUserId!);
               // Call your todaySummary() function here
               break;
             case 3:
@@ -131,15 +248,18 @@ void main() async {
             case 4:
               //---> go to Adding function
               print('Adding new expense...');
+
+              await addExpense(confirmedUserId!);
+
               break;
             case 5:
               //---> go to Delete function
               print('Deleting an expense...');
-              // Call your deleteExpense() function here
+              await deleteExpense(confirmedUserId!);
               break;
             case 6:
               //---> end program
-              print('----- Exiting Expense Tracking App. Goodbye! -----');
+              print('----- Bye -----');
               break;
             default:
               print('Unknown menu option. Please enter a number from 1 to 6.');
