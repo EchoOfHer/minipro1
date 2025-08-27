@@ -42,33 +42,32 @@ Future<void> addExpense(int userId) async {
 
 //Function Delete an expense
 Future<void> deleteExpense(int userId) async {
-  print("===== Delete Expense =====");
-  stdout.write("Enter item ID to delete: ");
-  String? input = stdin.readLineSync();
+  print("===== Delete an Item =====");
+  stdout.write('Item id: ');
+  int? id = int.tryParse(stdin.readLineSync() ?? '');
 
-  if (input == null || input.isEmpty) {
-    print("ID is required.");
+  if (id == null) {
+    print('Invalid ID');
     return;
   }
 
-  final expenseId = int.tryParse(input);
-  if (expenseId == null) {
-    print("Invalid ID format.");
-    return;
-  }
+  final url = Uri.parse('http://localhost:3000/expense/$id?user_id=$userId');
 
-  final url = Uri.parse("http://localhost:3000/deleteexpense");
+  try {
+    final response = await http.delete(url);
 
-  var response = await http.delete(
-    url,
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode({"user_id": userId, "expense_id": expenseId}),
-  );
-
-  if (response.statusCode == 200) {
-    print("Deleted!");
-  } else {
-    print("Error deleting expense: ${response.body}");
+    switch (response.statusCode) {
+      case 200:
+        print('Deleted!');
+        break;
+      case 404:
+        print('Item not found or does not belong to you.');
+        break;
+      default:
+        print('Failed to delete. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Request failed: $e');
   }
 }
 
