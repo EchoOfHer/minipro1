@@ -6,9 +6,13 @@ const baseUrl = "http://localhost:3000"; // Node.js server
 //Function all expenses
 void allExpense() {}
 //Function Todays expense
-Future<void> TodaysExpense() async {
+
+Future<void> TodaysExpense(int userId) async {
   try {
-    var response = await http.get(Uri.parse("$baseUrl/expenses/today"));
+    // สมมติ server รองรับ /expenses/today/:userId
+    var response = await http.get(
+      Uri.parse("$baseUrl/expenses/today/$userId"),
+    );
 
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
@@ -19,21 +23,16 @@ Future<void> TodaysExpense() async {
         print("No expenses found for today.");
       } else {
         for (var exp in data['expenses']) {
-          print(
-            "${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}",
-          );
+          print("${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}");
         }
       }
     } else {
-      print(
-        "Error fetching today's expenses. Status code: ${response.statusCode}",
-      );
+      print("Error fetching today's expenses. Status code: ${response.statusCode}");
     }
   } catch (e) {
     print("Error: $e");
   }
 }
-
 //Function Searching
 void Searching() {}
 //Function Add new expense
