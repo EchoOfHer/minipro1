@@ -7,49 +7,41 @@ void allExpense() {}
 //Function Todays expense
 void TodaysExpense() {}
 //Function Searching
-void Searching(List<String> items) {
+Future<void> Searching() async { // Changed to async as it will make an HTTP request
   stdout.write("Item to Search: ");
   String keyword = stdin.readLineSync()?.trim().toLowerCase() ?? "";
 
   if (keyword.isEmpty) {
-    print("❌ Item not found");
+    print(" Item not found (empty keyword)");
     return;
   }
 
-  // กรองข้อมูลที่มี keyword อยู่ใน string
-  List<String> results = items.where((item) => item.toLowerCase().contains(keyword)).toList();
+  // Construct the URL for your Node.js service
+  final url = Uri.parse('http://localhost:3000/searching?q=$keyword');
 
-  if (results.isEmpty) {
-    print("Item not found '$keyword'");
-  } else {
-    print("✅ พบข้อมูล:");
-    for (var r in results) {
-      print("- $r");
+  try {
+    // Make the HTTP GET request
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK status, print the response body
+      print(response.body);
+    } else if (response.statusCode == 400) {
+      // Handle bad request errors (e.g., empty keyword)
+      print("Error: ${response.body}");
+    } else if (response.statusCode == 500) {
+      // Handle server errors
+      print("Server Error: ${response.body}");
+    } else {
+      // Handle other unexpected status codes
+      print("Unexpected error: ${response.statusCode} - ${response.body}");
     }
+  } catch (e) {
+    // Catch any network or other exceptions
+    print("Failed to connect to the server: $e");
   }
 }
-Future<void> addExpense(String baseUrl, String userId) async {
-  stdout.write("Item: ");
-  String? item = stdin.readLineSync();
-  stdout.write("Paid: ");
-  String? paid = stdin.readLineSync();
 
-  var response = await http.post(
-    Uri.parse("$baseUrl/expenses"),
-    headers: {"Content-Type": "application/json"},
-    body: jsonEncode({
-      "user_id": userId,
-      "item": item,
-      "paid": int.tryParse(paid ?? "0"),
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    print(jsonDecode(response.body)["message"]);
-  } else {
-    print("Error adding expense: ${response.body}");
-  }
-}
 
 //Function Delete an expense
 void delete() {}
@@ -121,13 +113,12 @@ void main() async {
             case 3:
               //---> go to searching function
               print('Searching expenses...');
-              Searching([]);
+              await Searching();
               // Call your searchFunction() here
               break;
             case 4:
               //---> go to Adding function
               print('Adding new expense...');
-              await addExpense(baseUrl, userId);
               break;
             case 5:
               //---> go to Delete function
