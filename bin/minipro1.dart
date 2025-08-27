@@ -20,9 +20,7 @@ Future<void> addExpense(int userId) async {
     print("Please fill in both fields.");
     return;
   }
-
   final url = Uri.parse("http://localhost:3000/addexpenses");
-
   var response = await http.post(
     url,
     headers: {"Content-Type": "application/json"},
@@ -70,7 +68,6 @@ Future<void> deleteExpense(int userId) async {
     print('Request failed: $e');
   }
 }
-
 void main() async {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
