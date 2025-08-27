@@ -11,7 +11,7 @@ Future<void> allExpenses(int userId) async {
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
 
-      print("===== All Expenses for user $userId =====");
+      print("-------------  All Expenses ------------- ");
 
       if (data['expenses'].isEmpty) {
         print("No expenses found.");
@@ -43,7 +43,7 @@ Future<void> TodaysExpense(int userId) async {
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
 
-      print("===== Today's Expenses =====");
+      print("-------------  Today's Expenses ------------- ");
 
       if (data['expenses'].isEmpty) {
         print("No expenses found for today.");
