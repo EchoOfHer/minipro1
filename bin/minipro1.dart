@@ -6,42 +6,54 @@ import 'package:http/http.dart' as http;
 void allExpense() {}
 //Function Todays expense
 void TodaysExpense() {}
-//Function Searching
-Future<void> Searching() async { // Changed to async as it will make an HTTP request
+// Function Searching
+Future<void> Searching() async {
   stdout.write("Item to Search: ");
   String keyword = stdin.readLineSync()?.trim().toLowerCase() ?? "";
 
   if (keyword.isEmpty) {
-    print(" Item not found (empty keyword)");
+    print("No item: (empty keyword)");
     return;
   }
 
-  // Construct the URL for your Node.js service
-  final url = Uri.parse('http://localhost:3000/searching?q=$keyword');
+  final url = Uri.http('localhost:3000', '/searching', {'q': keyword});
 
   try {
-    // Make the HTTP GET request
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK status, print the response body
-      print(response.body);
+      // ลอง parse เป็น JSON ถ้าได้
+      try {
+        final List<dynamic> results = jsonDecode(response.body);
+
+        if (results.isEmpty) {
+          print("No item: $keyword");
+          return;
+        }
+
+        for (var item in results) {
+          int id = item['id'];
+          String itemName = item['item'];
+          int paid = item['paid'];
+          String date = item['date'];
+
+          print("$id. $itemName : $paid : $date");
+        }
+      } catch (_) {
+        // ถ้า response ไม่ใช่ JSON (กรณี server ส่งข้อความ No item)
+        print(response.body);
+      }
     } else if (response.statusCode == 400) {
-      // Handle bad request errors (e.g., empty keyword)
-      print("Error: ${response.body}");
+      print("Bad Request: ${response.body}");
     } else if (response.statusCode == 500) {
-      // Handle server errors
       print("Server Error: ${response.body}");
     } else {
-      // Handle other unexpected status codes
       print("Unexpected error: ${response.statusCode} - ${response.body}");
     }
   } catch (e) {
-    // Catch any network or other exceptions
     print("Failed to connect to the server: $e");
   }
 }
-
 
 //Function Delete an expense
 void delete() {}
