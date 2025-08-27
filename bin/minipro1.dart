@@ -32,12 +32,6 @@ Future<void> TodaysExpense(int userId) async {
   }
 }
 
-
-
-//Function all expenses
-void allExpense() {}
-//Function Todays expense
-void TodaysExpense() {}
 //Function Searching
 void Searching() {}
 //Function Add new expense
