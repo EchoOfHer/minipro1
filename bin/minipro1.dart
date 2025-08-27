@@ -236,13 +236,13 @@ void main() async {
             case 1:
               //---> go to Summarize all expense function
               print('Viewing all expenses...');
-              await TodaysExpense(confirmedUserId!);
+              await allExpenses(confirmedUserId!);
               // Call your summarizeAllExpenses() function here
               break;
             case 2:
               //---> go to Today's summarize function
               print("Viewing today's expenses...");
-              await allExpenses(confirmedUserId!);
+              await TodaysExpense(confirmedUserId!);
               // Call your todaySummary() function here
               break;
             case 3:
