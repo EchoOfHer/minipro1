@@ -15,11 +15,15 @@ Future<void> allExpenses(int userId) async {
       if (data['expenses'].isEmpty) {
         print("No expenses found.");
       } else {
+        int totalExpenses = 0;
         for (var exp in data['expenses']) {
+          // Add the 'paid' value to the total
+          totalExpenses += exp['paid'] as int; 
           print(
-            "${exp['id']}. ${exp['item']} : ${exp['amount']} : ${exp['date']}",
+            "${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}",
           );
         }
+        print("Total expenses = $totalExpenses ฿");
       }
     } else {
       print("Error fetching expenses. Status code: ${response.statusCode}");
@@ -46,9 +50,13 @@ Future<void> TodaysExpense(int userId) async {
       if (data['expenses'].isEmpty) {
         print("No expenses found for today.");
       } else {
+        int totalToday = 0;
         for (var exp in data['expenses']) {
+          // Add the 'paid' value to the daily total
+          totalToday += exp['paid'] as int;
           print("${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}");
         }
+        print("Total expenses for today = $totalToday ฿");
       }
     } else {
       print("Error fetching today's expenses. Status code: ${response.statusCode}");
