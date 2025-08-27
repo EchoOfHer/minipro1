@@ -7,9 +7,9 @@
         Branch : [⏳] Searching-Function
 
     3. Peach 
-        Branch : [⏳] Add-Function    
-                 [⏳] Delete-Function
+        Branch : [🎉] Add-Function    
+                 [🎉] Delete-Function
 
     4. Beam 
-        Branch : [⏳] Login-Function
+        Branch : [🎉] Login-Function
 
