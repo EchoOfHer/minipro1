@@ -1,54 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
-
-// Function Searching
-Future<void> Searching() async {
-  stdout.write("Item to Search: ");
-  String keyword = stdin.readLineSync()?.trim().toLowerCase() ?? "";
-
-  if (keyword.isEmpty) {
-    print("No item: (empty keyword)");
-    return;
-  }
-
-  final url = Uri.http('localhost:3000', '/searching', {'q': keyword});
-
-  try {
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      // ลอง parse เป็น JSON ถ้าได้
-      try {
-        final List<dynamic> results = jsonDecode(response.body);
-
-        if (results.isEmpty) {
-          print("No item: $keyword");
-          return;
-        }
-
-        for (var item in results) {
-          int id = item['id'];
-          String itemName = item['item'];
-          int paid = item['paid'];
-          String date = item['date'];
-
-          print("$id. $itemName : $paid : $date");
-        }
-      } catch (_) {
-        // ถ้า response ไม่ใช่ JSON (กรณี server ส่งข้อความ No item)
-        print(response.body);
-      }
-    } else if (response.statusCode == 400) {
-      print("Bad Request: ${response.body}");
-    } else if (response.statusCode == 500) {
-      print("Server Error: ${response.body}");
-    } else {
-      print("Unexpected error: ${response.statusCode} - ${response.body}");
-    }
-  } catch (e) {
-    print("Failed to connect to the server: $e");
 //Function all expenses
 const baseUrl = "http://localhost:3000"; // Node.js server
 Future<void> allExpenses(int userId) async {
@@ -80,6 +32,8 @@ Future<void> allExpenses(int userId) async {
     print("Error: $e");
   }
 }
+
+//Function all expenses
 //Function Todays expense
 Future<void> TodaysExpense(int userId) async {
   try {
@@ -111,6 +65,7 @@ Future<void> TodaysExpense(int userId) async {
     print("Error: $e");
   }
 }
+
 //Function Searching
 void Searching() {}
 //Function Add new expense
@@ -142,6 +97,7 @@ Future<void> addExpense(int userId) async {
     print("Error adding expense: ${response.body}");
   }
 }
+
 //Function Delete an expense
 Future<void> deleteExpense(int userId) async {
   print("===== Delete an Item =====");
@@ -242,15 +198,11 @@ void main() async {
             case 3:
               //---> go to searching function
               print('Searching expenses...');
-              await Searching();
               // Call your searchFunction() here
               break;
             case 4:
               //---> go to Adding function
-              print('Adding new expense...');
-
               await addExpense(confirmedUserId!);
-
               break;
             case 5:
               //---> go to Delete function
