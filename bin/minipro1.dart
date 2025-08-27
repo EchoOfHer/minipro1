@@ -177,7 +177,7 @@ void main() async {
           print('$key. $value');
         });
 
-        stdout.write('Choose an option: '); // Clarified prompt
+        stdout.write('Choose...'); // Clarified prompt
         String? choosingMenu = stdin.readLineSync();
 
         if (choosingMenu != null) {
