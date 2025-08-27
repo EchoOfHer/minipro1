@@ -20,9 +20,7 @@ Future<void> addExpense(int userId) async {
     print("Please fill in both fields.");
     return;
   }
-
   final url = Uri.parse("http://localhost:3000/addexpenses");
-
   var response = await http.post(
     url,
     headers: {"Content-Type": "application/json"},
@@ -39,8 +37,37 @@ Future<void> addExpense(int userId) async {
     print("Error adding expense: ${response.body}");
   }
 }
+
 //Function Delete an expense
-void delete() {}
+Future<void> deleteExpense(int userId) async {
+  print("===== Delete an Item =====");
+  stdout.write('Item id: ');
+  int? id = int.tryParse(stdin.readLineSync() ?? '');
+
+  if (id == null) {
+    print('Invalid ID');
+    return;
+  }
+
+  final url = Uri.parse('http://localhost:3000/expense/$id?user_id=$userId');
+
+  try {
+    final response = await http.delete(url);
+
+    switch (response.statusCode) {
+      case 200:
+        print('Deleted!');
+        break;
+      case 404:
+        print('Item not found or does not belong to you.');
+        break;
+      default:
+        print('Failed to delete. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Request failed: $e');
+  }
+}
 void main() async {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
@@ -118,7 +145,7 @@ void main() async {
             case 5:
               //---> go to Delete function
               print('Deleting an expense...');
-              // Call your deleteExpense() function here
+              await deleteExpense(confirmedUserId!);
               break;
             case 6:
               //---> end program
