@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+
 //Function all expenses
 const baseUrl = "http://localhost:3000"; // Node.js server
 Future<void> allExpenses(int userId) async {
@@ -18,7 +19,7 @@ Future<void> allExpenses(int userId) async {
         int totalExpenses = 0;
         for (var exp in data['expenses']) {
           // Add the 'paid' value to the total
-          totalExpenses += exp['paid'] as int; 
+          totalExpenses += exp['paid'] as int;
           print(
             "${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}",
           );
@@ -37,10 +38,7 @@ Future<void> allExpenses(int userId) async {
 //Function Todays expense
 Future<void> TodaysExpense(int userId) async {
   try {
-    
-    var response = await http.get(
-      Uri.parse("$baseUrl/expenses/today/$userId"),
-    );
+    var response = await http.get(Uri.parse("$baseUrl/expenses/today/$userId"));
 
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
@@ -54,12 +52,16 @@ Future<void> TodaysExpense(int userId) async {
         for (var exp in data['expenses']) {
           // Add the 'paid' value to the daily total
           totalToday += exp['paid'] as int;
-          print("${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}");
+          print(
+            "${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}",
+          );
         }
         print("Total expenses for today = $totalToday ฿");
       }
     } else {
-      print("Error fetching today's expenses. Status code: ${response.statusCode}");
+      print(
+        "Error fetching today's expenses. Status code: ${response.statusCode}",
+      );
     }
   } catch (e) {
     print("Error: $e");
@@ -67,7 +69,54 @@ Future<void> TodaysExpense(int userId) async {
 }
 
 //Function Searching
-void Searching() {}
+Future<void> Searching() async {
+  stdout.write("Item to Search: ");
+  String keyword = stdin.readLineSync()?.trim().toLowerCase() ?? "";
+
+  if (keyword.isEmpty) {
+    print("No item: (empty keyword)");
+    return;
+  }
+
+  final url = Uri.http('localhost:3000', '/searching', {'q': keyword});
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      // ลอง parse เป็น JSON ถ้าได้
+      try {
+        final List<dynamic> results = jsonDecode(response.body);
+
+        if (results.isEmpty) {
+          print("No item: $keyword");
+          return;
+        }
+
+        for (var item in results) {
+          int id = item['id'];
+          String itemName = item['item'];
+          int paid = item['paid'];
+          String date = item['date'];
+
+          print("$id. $itemName : $paid : $date");
+        }
+      } catch (_) {
+        // ถ้า response ไม่ใช่ JSON (กรณี server ส่งข้อความ No item)
+        print(response.body);
+      }
+    } else if (response.statusCode == 400) {
+      print("Bad Request: ${response.body}");
+    } else if (response.statusCode == 500) {
+      print("Server Error: ${response.body}");
+    } else {
+      print("Unexpected error: ${response.statusCode} - ${response.body}");
+    }
+  } catch (e) {
+    print("Failed to connect to the server: $e");
+  }
+}
+
 //Function Add new expense
 Future<void> addExpense(int userId) async {
   print("===== Add New Item =====");
@@ -128,6 +177,7 @@ Future<void> deleteExpense(int userId) async {
     print('Request failed: $e');
   }
 }
+
 void main() async {
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
@@ -197,7 +247,7 @@ void main() async {
               break;
             case 3:
               //---> go to searching function
-              print('Searching expenses...');
+              await Searching();
               // Call your searchFunction() here
               break;
             case 4:
