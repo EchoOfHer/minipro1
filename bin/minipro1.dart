@@ -1,15 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-
 const baseUrl = "http://localhost:3000"; // Node.js server
 //Function all expenses
 void allExpense() {}
 //Function Todays expense
-
 Future<void> TodaysExpense(int userId) async {
   try {
-    // สมมติ server รองรับ /expenses/today/:userId
+    
     var response = await http.get(
       Uri.parse("$baseUrl/expenses/today/$userId"),
     );
@@ -33,15 +31,70 @@ Future<void> TodaysExpense(int userId) async {
     print("Error: $e");
   }
 }
-
-
 //Function Searching
 void Searching() {}
 //Function Add new expense
-void add() {}
+Future<void> addExpense(int userId) async {
+  print("===== Add New Item =====");
+  stdout.write("Item: ");
+  String? item = stdin.readLineSync();
+  stdout.write("Paid: ");
+  String? paid = stdin.readLineSync();
+
+  if (item == null || item.isEmpty || paid == null || paid.isEmpty) {
+    print("Please fill in both fields.");
+    return;
+  }
+  final url = Uri.parse("http://localhost:3000/addexpenses");
+  var response = await http.post(
+    url,
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "user_id": userId,
+      "item": item,
+      "paid": int.tryParse(paid) ?? 0,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print("Inserted!");
+  } else {
+    print("Error adding expense: ${response.body}");
+  }
+}
+
 //Function Delete an expense
-void delete() {}
-void main() {
+Future<void> deleteExpense(int userId) async {
+  print("===== Delete an Item =====");
+  stdout.write('Item id: ');
+  int? id = int.tryParse(stdin.readLineSync() ?? '');
+
+  if (id == null) {
+    print('Invalid ID');
+    return;
+  }
+
+  final url = Uri.parse('http://localhost:3000/expense/$id?user_id=$userId');
+
+  try {
+    final response = await http.delete(url);
+
+    switch (response.statusCode) {
+      case 200:
+        print('Deleted!');
+        break;
+      case 404:
+        print('Item not found or does not belong to you.');
+        break;
+      default:
+        print('Failed to delete. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Request failed: $e');
+  }
+}
+void main() async {
+
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
     1: "All expense",
@@ -51,22 +104,41 @@ void main() {
     5: "Delete an expense",
     6: "Exit",
   };
+  //fetch from server after login
+  String? confirmedUsername;
+  int? confirmedUserId;
   //Login
   print('==== Login ====');
   stdout.write('Username: ');
-  String? username = stdin.readLineSync();
+  String? inputUsername = stdin.readLineSync();
   stdout.write('Password: ');
   String? password = stdin.readLineSync();
 
-  if (username != null && password != null) {
+  if (inputUsername != null && password != null) {
     //.... Check login, This is dummy condition
-    if (0 == 0) {
-      int? selectedMenu; // Declare selectedMenu outside the loop
+    final body = {"username": inputUsername, "password": password};
+    final url = Uri.parse('http://localhost:3000/login');
+    final response = await http.post(url, body: body);
 
+    if (response.statusCode == 200) {
+      int? selectedMenu; // Declare selectedMenu outside the loop
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final Map<String, dynamic>? user = responseData['user'];
+      if (user != null &&
+          user.containsKey('username') &&
+          user.containsKey('id')) {
+        confirmedUsername = user['username'];
+        confirmedUserId = user['id'];
+      } else {
+        print(
+          'Warning: Server did not provide username in response. Using input username.',
+        );
+        confirmedUsername = inputUsername;
+      }
       // Main Application Loop
       do {
         print('\n========== Expense Tracking App ==========');
-        print('Welcome ... '); // Display the entered username
+        print('Welcome $confirmedUsername ');
         menu.forEach((key, value) {
           print('$key. $value');
         });
@@ -94,13 +166,12 @@ void main() {
               break;
             case 4:
               //---> go to Adding function
-              print('Adding new expense...');
-              // Call your addExpense() function here
+              await addExpense(confirmedUserId!);
               break;
             case 5:
               //---> go to Delete function
               print('Deleting an expense...');
-              // Call your deleteExpense() function here
+              await deleteExpense(confirmedUserId!);
               break;
             case 6:
               //---> end program
@@ -119,6 +190,8 @@ void main() {
           stdin.readLineSync(); // Wait for user to press Enter
         }
       } while (selectedMenu != 6);
+    } else {
+      print("Username or password wrong!");
     }
   } else {
     print('Input error. Please try again');
