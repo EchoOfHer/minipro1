@@ -17,7 +17,7 @@ Future<void> allExpenses(int userId) async {
       } else {
         for (var exp in data['expenses']) {
           print(
-            "${exp['id']} | ${exp['item']} | ${exp['amount']} | ${exp['date']}",
+            "${exp['id']}. ${exp['item']} : ${exp['amount']} : ${exp['date']}",
           );
         }
       }
@@ -29,9 +29,7 @@ Future<void> allExpenses(int userId) async {
   }
 }
 
-const baseUrl = "http://localhost:3000"; // Node.js server
 //Function all expenses
-void allExpense() {}
 //Function Todays expense
 Future<void> TodaysExpense(int userId) async {
   try {
@@ -49,7 +47,7 @@ Future<void> TodaysExpense(int userId) async {
         print("No expenses found for today.");
       } else {
         for (var exp in data['expenses']) {
-          print("${exp['id']} | ${exp['item']} | ${exp['paid']} | ${exp['date']}");
+          print("${exp['id']}. ${exp['item']} : ${exp['paid']} : ${exp['date']}");
         }
       }
     } else {
@@ -180,11 +178,13 @@ void main() async {
             case 1:
               //---> go to Summarize all expense function
               print('Viewing all expenses...');
+              await TodaysExpense(confirmedUserId!);
               // Call your summarizeAllExpenses() function here
               break;
             case 2:
               //---> go to Today's summarize function
               print("Viewing today's expenses...");
+              await allExpenses(confirmedUserId!);
               // Call your todaySummary() function here
               break;
             case 3:
@@ -203,7 +203,7 @@ void main() async {
               break;
             case 6:
               //---> end program
-              print('----- Exiting Expense Tracking App. Goodbye! -----');
+              print('----- Bye -----');
               break;
             default:
               print('Unknown menu option. Please enter a number from 1 to 6.');
