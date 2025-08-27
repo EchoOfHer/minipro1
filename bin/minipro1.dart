@@ -18,7 +18,7 @@ Future<void> allExpenses(int userId) async {
       } else {
         for (var exp in data['expenses']) {
           print(
-            "${exp['id']} | ${exp['title']} | ${exp['amount']} | ${exp['date']}",
+            "${exp['id']} | ${exp['item']} | ${exp['amount']} | ${exp['date']}",
           );
         }
       }
@@ -29,7 +29,6 @@ Future<void> allExpenses(int userId) async {
     print("Error: $e");
   }
 }
-
 //Function Todays expense
 
 
