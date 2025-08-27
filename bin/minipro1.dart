@@ -1,6 +1,34 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+//Function all expenses
+const baseUrl = "http://localhost:3000"; // Node.js server
+Future<void> allExpenses(int userId) async {
+  try {
+    var response = await http.get(Uri.parse("$baseUrl/expenses/$userId"));
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+
+      print("===== All Expenses for user $userId =====");
+
+      if (data['expenses'].isEmpty) {
+        print("No expenses found.");
+      } else {
+        for (var exp in data['expenses']) {
+          print(
+            "${exp['id']} | ${exp['item']} | ${exp['amount']} | ${exp['date']}",
+          );
+        }
+      }
+    } else {
+      print("Error fetching expenses. Status code: ${response.statusCode}");
+    }
+  } catch (e) {
+    print("Error: $e");
+  }
+}
+
 const baseUrl = "http://localhost:3000"; // Node.js server
 //Function all expenses
 void allExpense() {}
@@ -95,7 +123,6 @@ Future<void> deleteExpense(int userId) async {
   }
 }
 void main() async {
-
   //["All expense","Today's expense","Serch"];
   Map<int, String> menu = {
     1: "All expense",
